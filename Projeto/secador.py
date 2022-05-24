@@ -15,11 +15,9 @@ secador = {
 }
 
 def client_handler(client, msg):
-    while 1:
-        
-        secador["solucao_secador"] = float(msg["solucao"]) * 0.005
-        client.send(str.encode(json.dumps(secador)))            
-        break        
+
+    secador["solucao_secador"] = float(msg) * 0.005
+    client.send(str.encode(json.dumps(secador)))            
 
 def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
@@ -35,7 +33,8 @@ def main():
         conexao, addr = server.accept()
         print(conexao)
         msg = conexao.recv(1024).decode()
-        threading.Thread(target= client_handler, args=(conexao, json.loads(msg))).start()    
+        print(msg)
+        threading.Thread(target= client_handler, args=(conexao, msg)).start()    
             
 
 if __name__ == "__main__":

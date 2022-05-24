@@ -19,7 +19,6 @@ def entrega_oleo():
     global value_tanque
 
     while True:
-        #tempo_espera = random.uniform(1, 10)
         tanque_oleo["Armazenamento"] += random.uniform(1, 2)
         print(f"VALOR TOTAL DO TANQUE {tanque_oleo['Armazenamento']}")
         sleep(10)
@@ -31,13 +30,12 @@ def client_handler(client):
         valor_vazao = 0.75
         tanque_oleo["Armazenamento"] -= valor_vazao
         if tanque_oleo["Armazenamento"] < 0:
-            valor_vazao = 0            
             tanque_oleo["Armazenamento"] = 0            
-            print(f"TOTAL {tanque_oleo['Armazenamento']}")
-            client.send(str(valor_vazao).encode())
+            sleep(1)
+            client.send(str(tanque_oleo["Armazenamento"]).encode())
         else:
-            client.send(str(valor_vazao).encode())
-            print(f"TOTAL {tanque_oleo['Armazenamento']}")
+            sleep(1)
+            client.send(str(tanque_oleo["Armazenamento"]).encode())
         break
 
 def main():

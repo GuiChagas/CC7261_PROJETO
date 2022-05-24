@@ -11,8 +11,8 @@ from time import sleep
 #PARA LOGICA DOS 10 SEC USAR SLEEP
 
 reator = {
-    "oleo": 0.00,
-    "naOH": 0.00, 
+    "oleo": 0.0,
+    "naOH": 0.0, 
     "etOH": 0.00,
     "mix": 0.00
 }
@@ -22,42 +22,43 @@ def client_handler(client, msg):
     parte_1 = 1.25
     parte_2 = 2.5
 
-    print(f"MENSAGEM RECEBIDA: {msg}")
+    print(f"Valores recebidos do orquestrador: {msg}")
     print("")
-    print(f"VALOR REATOR: {reator}")
+    print(f"Valores do elementos no reator: {reator}")
 
-    if msg != '':
-        reator["naOH"] += msg["naOH"]
-        reator["etOH"] += msg["etOH"]
-        reator["oleo"] += msg["oleo"]
-            
-        if (reator["etOH"] < reator["naOH"]) and (reator["etOH"] < reator["oleo"]):
-            menor_elemento = reator["etOH"]
-        elif (reator["naOH"] < reator["etOH"]) and (reator["naOH"] < reator["oleo"]):
-            menor_elemento = reator["naOH"]
+    if msg != '':            
+        if (msg["etOH"] < msg["naOH"]) and (msg["etOH"] < msg["oleo"]):
+            menor_elemento = msg["etOH"]
+        elif (msg["naOH"] < msg["etOH"]) and (msg["naOH"] < msg["oleo"]):
+            menor_elemento = msg["naOH"]
         else:
-            menor_elemento = reator["naOH"]
+            menor_elemento = msg["naOH"]
         
-        if menor_elemento < parte_1 and menor_elemento > 0 and (reator["oleo"] >= (menor_elemento*2)):
+        if menor_elemento < parte_1 and menor_elemento > 0 and (msg["oleo"] >= (menor_elemento*2)):
             reator["etOH"] = menor_elemento
             reator["naOH"] = menor_elemento
             reator["oleo"] = (menor_elemento * 2)
-            reator["mix"] = ((reator["etOH"] + reator["naOH"]) + reator["oleo"])
+            reator["mix"] = ((msg["etOH"] + msg["naOH"]) + msg["oleo"])
+            sleep(menor_elemento * 4)
+            
             client.send(str.encode(json.dumps(reator)))            
-        elif menor_elemento >= parte_1 and (reator["oleo"] >= parte_2): 
+        elif menor_elemento >= parte_1 and (msg["oleo"] >= parte_2): 
             reator["etOH"] = parte_1
             reator["naOH"] = parte_1
             reator["oleo"] = parte_2
-            reator["mix"] += ((reator["etOH"] + reator["naOH"]) + reator["oleo"])
+            reator["mix"] += ((msg["etOH"] + msg["naOH"]) + msg["oleo"])
+            sleep(5)
+            
             client.send(str.encode(json.dumps(reator)))    
-        elif reator["oleo"] == menor_elemento:        
+        elif msg["oleo"] == menor_elemento:        
             reator["etOH"] = (menor_elemento / 2)
             reator["naOH"] = (menor_elemento / 2)
             reator["oleo"] = (menor_elemento * 4)
-            reator["mix"] += ((reator["etOH"] + reator["naOH"]) + reator["oleo"])
-            client.send(str.encode(json.dumps(reator)))
-    sleep(menor_elemento * 4) #tempo de vazão
+            reator["mix"] += ((msg["etOH"] + msg["naOH"]) + msg["oleo"])
+            sleep(menor_elemento * 4)
 
+            client.send(str.encode(json.dumps(reator)))
+        
 def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 
