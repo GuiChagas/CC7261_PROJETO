@@ -14,7 +14,9 @@ orquestrador_dados = {
         "etOH": 0,
         "naOH": 0,
         "mix": 0,
+        "status": "disponivel",
         "ciclos": 0
+        
     },
     "decantador": {    
         "glicerina":0,
@@ -72,7 +74,7 @@ def listen_server_reator(client):
             print(f"Valor de naOH recebido do reator: {msg['naOH']}")
             print(f"Valor de etOH recebido do reator: {msg['etOH']}")
                       
-
+            orquestrador_dados["reator"]["status"] = "disponivel"
             orquestrador_dados["reator"]["mix"] += float(msg["mix"])
             orquestrador_dados["reator"]["ciclos"] += float(msg["ciclo"])
 
@@ -293,8 +295,8 @@ def orc_reator():
             else:
                 orquestrador_dados["reator"]["oleo"] +=  orquestrador_dados["oleo"]
                 orquestrador_dados["oleo"] = 0
-            
-            print(f"DEPOIS: {orquestrador_dados['reator']}")
+            orquestrador_dados["reator"]["status"] = "processando"
+
             jserialize = json.dumps(orquestrador_dados["reator"])
             c.connect((socket.gethostname(), 50004))
             c.send(str.encode(jserialize))
@@ -476,8 +478,8 @@ def main():
             sleep(1)
             threading.Thread(target= orc_tanque_naetOH, args=()).start()
             sleep(1)
-            if (orquestrador_dados["naOH"] > 0) and (orquestrador_dados["etOH"] > 0) and (orquestrador_dados["oleo"] > 0) and (orquestrador_dados["decantador"]["status"] == "disponivel"):
-                sleep(1)
+            if (orquestrador_dados["naOH"] > 0) and (orquestrador_dados["etOH"] > 0) and (orquestrador_dados["oleo"] > 0) and (orquestrador_dados["reator"]["status"] == "disponivel"):
                 threading.Thread(target= orc_reator, args=()).start()
+                sleep(1)
 if __name__ == '__main__': 
     main() 
