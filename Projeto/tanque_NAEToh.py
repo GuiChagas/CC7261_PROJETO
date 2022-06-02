@@ -18,14 +18,17 @@ tanque_naetOH = {
 def entrega_componentes():    
 
     while True:
-        print(f"{tanque_naetOH}")
         sleep(1)
+        print("")
+        print(f"Entrada de naOH: {tanque_naetOH['naOH']}")
+        print(f"Entrada de etOH: {tanque_naetOH['etOH']}")
 
 
 def client_handler(client):
 
     while 1:  
         jserialize = json.dumps(tanque_naetOH)
+        sleep(1)        
         client.send(str.encode(jserialize))
         break
 
@@ -43,7 +46,6 @@ def main():
 
     while 1:
         conexao, addr = server.accept()
-        print(conexao)
         threading.Thread(target= client_handler, args=(conexao, )).start()    
             
 

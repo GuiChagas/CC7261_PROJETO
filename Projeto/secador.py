@@ -11,13 +11,23 @@ from time import sleep
 #PARA LOGICA DOS 10 SEC USAR SLEEP
 
 secador = {
-    "solucao_secador": 0
+    "solucao_secador": 0,
+    "perda_produto": 0
 }
 
 def client_handler(client, msg):
 
-    secador["solucao_secador"] = float(msg) * 0.005
-    client.send(str.encode(json.dumps(secador)))            
+    print(f"Entrada no secador: {msg}")
+
+    secador["solucao_secador"] = float(msg) * 0.995
+    secador["perda_produto"] = float(msg) * 0.005
+
+    print(f"Saída do secador: {secador['solucao_secador']}")
+    print(f"Perda de produto do secador: {secador['perda_produto']}")
+
+    sleep(5 * secador["solucao_secador"])    
+
+    client.send(str.encode(json.dumps(secador)))        
 
 def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
@@ -31,9 +41,7 @@ def main():
 
     while 1:
         conexao, addr = server.accept()
-        print(conexao)
         msg = conexao.recv(1024).decode()
-        print(msg)
         threading.Thread(target= client_handler, args=(conexao, msg)).start()    
             
 

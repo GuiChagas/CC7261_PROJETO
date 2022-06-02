@@ -17,14 +17,18 @@ tanque_lavagem = {
 
 def client_handler(client, msg):
 
-    tanque_lavagem["solucao"] = float(msg["solucao_secador"]) * 0.975
-    tanque_lavagem["emulsao"] = float(msg["solucao_secador"]) * 0.025
+    print(f"HANDLER RECEVIDO: {msg}")
+    tanque_lavagem["solucao"] = float(msg) * 0.975
+    tanque_lavagem["emulsao"] = float(msg) * 0.025
+
+    print("")
+    print(f"Saída do tanque de lavagem 1: {tanque_lavagem['solucao']}")
+    print(f"Emulsao do tanque de lavagem 1: {tanque_lavagem['emulsao']}") 
+
+    sleep(tanque_lavagem["solucao"] / 1.5)
+
     client.send(str.encode(json.dumps(tanque_lavagem)))
-
-    if tanque_lavagem["emulsao"] >= 1.5:
-        tanque_lavagem["emulsao"] = 1.5
-
-    sleep(1)
+    
 
      
 
@@ -40,10 +44,8 @@ def main():
 
     while 1:
         conexao, addr = server.accept()
-        print(conexao)
         msg = conexao.recv(1024).decode()
         threading.Thread(target= client_handler, args=(conexao, msg)).start()    
-            
 
 if __name__ == "__main__":
     main()

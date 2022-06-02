@@ -15,11 +15,10 @@ tanque_glicerina = {
 }
 
 def client_handler(client, msg):
-    while 1:
-        
-        tanque_glicerina["glicerina"] += float(msg)
-        client.send(str.encode(json.dumps(tanque_glicerina)))            
-        break        
+    tanque_glicerina["glicerina"] += float(msg)
+    print(f"Total de glicerina produzida: {tanque_glicerina['glicerina']}")
+
+    client.send(str.encode(json.dumps(tanque_glicerina)))                    
 
 def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
@@ -33,9 +32,8 @@ def main():
 
     while 1:
         conexao, addr = server.accept()
-        print(conexao)
         msg = conexao.recv(1024).decode()
-        threading.Thread(target= client_handler, args=(conexao, json.loads(msg))).start()    
+        threading.Thread(target= client_handler, args=(conexao, msg)).start()    
             
 
 if __name__ == "__main__":

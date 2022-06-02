@@ -10,7 +10,7 @@ from time import sleep
 #PARA LOGICA DOS 10 SEC USAR SLEEP
 
 tanque_oleo = {
-    "Armazenamento": 0
+    "Armazenamento": 0.00
 }
 
 value_tanque = 0.00
@@ -20,7 +20,7 @@ def entrega_oleo():
 
     while True:
         tanque_oleo["Armazenamento"] += random.uniform(1, 2)
-        print(f"VALOR TOTAL DO TANQUE {tanque_oleo['Armazenamento']}")
+        print(f"Valor total de armazenamento do tanque de óleo: {tanque_oleo['Armazenamento']}")
         sleep(10)
 
 
@@ -28,13 +28,19 @@ def client_handler(client):
 
     while 1:
         valor_vazao = 0.75
-        tanque_oleo["Armazenamento"] -= valor_vazao
-        if tanque_oleo["Armazenamento"] < 0:
-            tanque_oleo["Armazenamento"] = 0            
+        
+        
+        if tanque_oleo["Armazenamento"] >= valor_vazao:
+            tanque_oleo["Armazenamento"] -= valor_vazao
             sleep(1)
-            client.send(str(tanque_oleo["Armazenamento"]).encode())
+            client.send((str(valor_vazao)).encode())
+            
+        elif (tanque_oleo["Armazenamento"] < valor_vazao) and tanque_oleo["Armazenamento"] > 0:
+            sleep(1)
+            client.send((str(tanque_oleo["Armazenamento"])).encode())
+            tanque_oleo["Armazenamento"] -= tanque_oleo["Armazenamento"]
+        
         else:
-            sleep(1)
             client.send(str(tanque_oleo["Armazenamento"]).encode())
         break
 
@@ -53,7 +59,6 @@ def main():
 
     while 1:
         conexao, addr = server.accept()
-        print(conexao)
         threading.Thread(target= client_handler, args=(conexao, )).start()    
             
 
